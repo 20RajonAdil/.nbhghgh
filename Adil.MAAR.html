@@ -7,6 +7,13 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/suncalc@1.9.0/suncalc.js"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  window.supabase = createClient(
+    'https://ackefhtirpxisbwgaebu.supabase.co',
+    'sb_publishable_DdDBiyPfQD8lg9I0Cb9l_Q_KDuGKCnq'
+  );
+</script>
 
 <style>
 :root{
@@ -23,10 +30,11 @@ header{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:rg
 .nav{display:flex;align-items:center;padding:14px 20px;gap:16px;}
 .logo{display:flex;gap:10px;align-items:center;font-weight:800;cursor:pointer;}
 .logo span{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#041024;font-weight:900;}
-.tabs{display:flex;gap:8px;margin-left:auto;}
+.tabs{display:flex;gap:8px;margin-left:auto;align-items:center;}
 .tab{padding:8px 14px;border-radius:999px;cursor:pointer;color:var(--muted);transition:0.3s;}
 .tab:hover{color:var(--accent2);}
 .tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#041024;font-weight:700;}
+.google-login-btn{margin-left:10px;padding:6px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#041024;font-weight:700;cursor:pointer;}
 main{padding:20px;max-width:1200px;margin:auto;}
 .panel{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
 .page{display:none;animation:fade .4s ease;}
@@ -107,12 +115,13 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 
 <header>
 <div class="nav">
-<div class="logo" onclick="openTab('home')"><span>QM</span> Quran Maar</div>
-<div class="tabs">
-<div class="tab active" data-tab="home">Home</div>
-<div class="tab" data-tab="quran">Qur’an</div>
-<div class="tab" data-tab="about">About</div>
-</div>
+  <div class="logo" onclick="openTab('home')"><span>QM</span> Quran Maar</div>
+  <div class="tabs">
+    <div class="tab active" data-tab="home">Home</div>
+    <div class="tab" data-tab="quran">Qur’an</div>
+    <div class="tab" data-tab="about">About</div>
+    <button class="google-login-btn" id="googleLoginBtn">Google Login</button>
+  </div>
 </div>
 </header>
 
@@ -153,7 +162,8 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </select>
 </div>
 <div style="height:70vh;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.15)">
-<iframe id="quranFrame" src="Quran.Arabic.pdf" style="width:100%;height:100%;border:none"></iframe>
+<iframe id="quranFrame" src="Quran.Arabic.pdf" style="width:100%;height:100%;border:none;pointer-events:none;"></iframe>
+<div style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" onmousedown="return false;"></div>
 </div>
 </div>
 </section>
@@ -268,7 +278,6 @@ function updateMoonAndSun(){
     const lat=pos.coords.latitude;
     const lon=pos.coords.longitude;
 
-    // Moon
     const moonPos=SunCalc.getMoonPosition(now,lat,lon);
     const moonIll=SunCalc.getMoonIllumination(now);
     const moonTimes=SunCalc.getMoonTimes(now,lat,lon);
@@ -292,7 +301,6 @@ function updateMoonAndSun(){
     const arrow=document.getElementById("compassArrow");
     if(arrow){arrow.style.transform=`rotate(${moonAz}deg)`;}
 
-    // Sun
     const sunPos=SunCalc.getPosition(now,lat,lon);
     const sunAlt=(sunPos.altitude*180/Math.PI).toFixed(2);
     const sunAz=((sunPos.azimuth*180/Math.PI)+180).toFixed(2);
@@ -304,6 +312,13 @@ function updateMoonAndSun(){
 }
 updateMoonAndSun();
 setInterval(updateMoonAndSun,60000);
+
+/* ---------- GOOGLE LOGIN ---------- */
+document.getElementById('googleLoginBtn').onclick = async ()=>{
+  const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+  if(error) alert('Login failed: '+error.message);
+  else if(data.url) window.location.href = data.url;
+};
 </script>
 </body>
 </html>
