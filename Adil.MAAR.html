@@ -161,9 +161,11 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 <option value="bangla">Bangla</option>
 </select>
 </div>
-<div style="height:70vh;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.15)">
-<iframe id="quranFrame" src="Quran.Arabic.pdf" style="width:100%;height:100%;border:none;pointer-events:none;"></iframe>
-<div style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" onmousedown="return false;"></div>
+
+<!-- PDF.js Viewer -->
+<div id="quranContainer" style="height:70vh;overflow:auto;border-radius:12px;border:1px solid rgba(255,255,255,.15);position:relative;">
+  <canvas id="pdfCanvas" style="width:100%;"></canvas>
+  <div style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" onmousedown="return false;"></div>
 </div>
 </div>
 </section>
@@ -184,6 +186,9 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </div>
 </section>
 </main>
+
+<!-- PDF.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.177/pdf.min.js"></script>
 
 <script>
 /* ---------- TABS ---------- */
@@ -262,14 +267,32 @@ async function loadPrayer(){
 }
 loadPrayer();
 
-/* ---------- QURAN PDF ---------- */
-document.getElementById('lang').onchange=e=>{
-  const f=document.getElementById('quranFrame');
-  f.src =
-    e.target.value==="arabic" ? "Quran.Arabic.pdf" :
-    e.target.value==="english" ? "Quran.English.pdf" :
-    "Quran.Bangla.pdf";
+/* ---------- QURAN PDF.JS ---------- */
+const pdfFiles = {
+  arabic: 'Quran.Arabic.pdf',
+  english: 'Quran.English.pdf',
+  bangla: 'Quran.Bangla.pdf'
 };
+let pdfDoc = null, pageNum = 1;
+const canvas = document.getElementById('pdfCanvas');
+const ctx = canvas.getContext('2d');
+
+async function loadPDF(lang) {
+  const loadingTask = pdfjsLib.getDocument(pdfFiles[lang]);
+  pdfDoc = await loadingTask.promise;
+  renderPage(pageNum);
+}
+
+async function renderPage(num) {
+  const page = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: canvas.clientWidth / page.getViewport({ scale:1 }).width });
+  canvas.height = viewport.height;
+  const renderContext = { canvasContext: ctx, viewport: viewport };
+  page.render(renderContext);
+}
+
+document.getElementById('lang').onchange = e => loadPDF(e.target.value);
+loadPDF('arabic');
 
 /* ---------- MOON + SUN ---------- */
 function updateMoonAndSun(){
