@@ -7,7 +7,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/suncalc@1.9.0/suncalc.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.177/pdf.min.js"></script>
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
   window.supabase = createClient(
@@ -50,25 +49,65 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 .list div:hover{background:rgba(255,255,255,.05);}
 .clock-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px;}
 .clock-box{padding:8px;border-radius:8px;background:rgba(255,255,255,.05);min-width:140px;text-align:center;}
+
+/* Prayer Ticker */
 #prayerTicker{display:flex;white-space:nowrap;animation:scrollTicker 20s linear infinite;}
 #prayerTicker div{display:inline-block;padding-right:24px;}
 .highlight{color:var(--accent);font-weight:700;text-shadow:0 0 8px var(--accent),0 0 16px var(--accent2);animation:pulse 1.5s infinite;}
 @keyframes pulse{0% {text-shadow:0 0 4px var(--accent),0 0 8px var(--accent2)} 50% {text-shadow:0 0 12px var(--accent),0 0 24px var(--accent2)} 100% {text-shadow:0 0 4px var(--accent),0 0 8px var(--accent2)}}
 @keyframes scrollTicker{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+
+/* Moon */
 .moon-wrapper{display:flex;justify-content:center;align-items:center;margin-top:20px;}
 .moon{width:130px;height:130px;border-radius:50%;background:var(--moon-base);position:relative;overflow:hidden;box-shadow:0 0 40px rgba(255,255,255,.2);animation:floatMoon 6s ease-in-out infinite;}
 .moon-light{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:var(--moon-color);}
 @keyframes floatMoon{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* Sky with sun dot */
 .sky{position:relative;height:120px;margin-top:20px;border-top:1px dashed rgba(255,255,255,.2);}
 .sun-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--sun-color);box-shadow:0 0 12px var(--sun-color);transition:left 0.5s,bottom 0.5s;}
+
+/* Compass for moon */
 #moonCompass{position:relative;width:150px;height:150px;margin:auto;border:2px solid rgba(255,255,255,.3);border-radius:50%;margin-top:16px;}
 #compassArrow{position:absolute;top:50%;left:50%;width:4px;height:60px;background:var(--sun-color);transform-origin:bottom center;transform:rotate(0deg);border-radius:2px;box-shadow:0 0 8px var(--sun-color);transition:transform 1s ease;}
-.profile-card{display:inline-block;background:rgba(255,255,255,.05);border-radius:16px;padding:16px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4);backdrop-filter:blur(8px);}
-.profile-card .profile-image{width:150px;height:150px;margin:auto;border-radius:50%;overflow:hidden;border:3px solid var(--accent);}
-.profile-card .profile-image img{width:100%;height:100%;object-fit:cover;}
-.profile-card .profile-info{margin-top:12px;}
-.profile-card .profile-info h3{margin:0;font-size:18px;font-weight:800;}
-.profile-card .profile-info p{font-size:13px;color:var(--muted);margin-top:4px;}
+
+/* Profile Card */
+.profile-card{
+  display:inline-block;
+  background:rgba(255,255,255,.05);
+  border-radius:16px;
+  padding:16px;
+  max-width:280px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  backdrop-filter:blur(8px);
+}
+.profile-card .profile-image{
+  width:150px;
+  height:150px;
+  margin:auto;
+  border-radius:50%;
+  overflow:hidden;
+  border:3px solid var(--accent);
+}
+.profile-card .profile-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.profile-card .profile-info{
+  margin-top:12px;
+}
+.profile-card .profile-info h3{
+  margin:0;
+  font-size:18px;
+  font-weight:800;
+}
+.profile-card .profile-info p{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
 @media(max-width:768px){.panel{flex-direction:column;}.list{width:100% !important;}}
 </style>
 </head>
@@ -87,6 +126,7 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </header>
 
 <main>
+<!-- HOME -->
 <section id="home" class="page active">
 <div class="panel">
 <div style="font-weight:800">Prayer Times</div>
@@ -110,6 +150,7 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </div>
 </section>
 
+<!-- QURAN -->
 <section id="quran" class="page">
 <div class="panel" style="display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;align-items:center;gap:8px;">
@@ -119,9 +160,9 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 <option value="english">English</option>
 <option value="bangla">Bangla</option>
 </select>
-<span id="pageInfo" class="small" style="margin-left:8px;"></span>
 </div>
 
+<!-- PDF.js Viewer -->
 <div id="quranContainer" style="height:70vh;overflow:auto;border-radius:12px;border:1px solid rgba(255,255,255,.15);position:relative;">
   <canvas id="pdfCanvas" style="width:100%;"></canvas>
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;" oncontextmenu="return false;" onmousedown="return false;"></div>
@@ -129,6 +170,7 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </div>
 </section>
 
+<!-- ABOUT -->
 <section id="about" class="page">
 <div class="panel" style="text-align:center">
   <div class="profile-card">
@@ -144,6 +186,8 @@ button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));co
 </div>
 </section>
 </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.177/pdf.min.js"></script>
 
 <script>
 /* ---------- TABS ---------- */
@@ -222,27 +266,30 @@ async function loadPrayer(){
 }
 loadPrayer();
 
-/* ---------- QURAN PDF ---------- */
-const pdfFiles = { arabic:'Quran.Arabic.pdf', english:'Quran.English.pdf', bangla:'Quran.Bangla.pdf' };
-let pdfDoc = null, pageNum = 1, totalPages = 1;
+/* ---------- QURAN PDF.JS ---------- */
+const pdfFiles = {
+  arabic: 'Quran.Arabic.pdf',
+  english: 'Quran.English.pdf',
+  bangla: 'Quran.Bangla.pdf'
+};
+let pdfDoc = null, pageNum = 1;
 const canvas = document.getElementById('pdfCanvas');
 const ctx = canvas.getContext('2d');
 
-async function loadPDF(lang){
-  pageNum = 1;
+async function loadPDF(lang) {
   const loadingTask = pdfjsLib.getDocument(pdfFiles[lang]);
   pdfDoc = await loadingTask.promise;
-  totalPages = pdfDoc.numPages;
+  pageNum = 1;
   renderPage(pageNum);
 }
 
-async function renderPage(num){
+async function renderPage(num) {
+  if(!pdfDoc) return;
   const page = await pdfDoc.getPage(num);
-  const viewport = page.getViewport({ scale: canvas.clientWidth / page.getViewport({ scale:1 }).width });
+  const scale = canvas.clientWidth / page.getViewport({ scale:1 }).width;
+  const viewport = page.getViewport({ scale });
   canvas.height = viewport.height;
-  await page.render({canvasContext: ctx, viewport}).promise;
-  const pageInfo = document.getElementById('pageInfo');
-  if(pageInfo) pageInfo.textContent = `Page ${pageNum} / ${totalPages}`;
+  await page.render({ canvasContext: ctx, viewport: viewport }).promise;
 }
 
 document.getElementById('lang').onchange = e => loadPDF(e.target.value);
