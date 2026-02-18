@@ -318,10 +318,22 @@ document.getElementById('lang').onchange=e=>loadPDF(e.target.value);
 loadPDF('arabic');
 
 /* ---------- Moon + Sun ---------- */
+document.getElementById('lang').onchange=e=>{
+  const f=document.getElementById('quranFrame');
+  f.src =
+    e.target.value==="arabic" ? "Quran.Arabic.pdf" :
+    e.target.value==="english" ? "Quran.English.pdf" :
+    "Quran.Bangla.pdf";
+};
+
+/* ---------- MOON + SUN ---------- */
 function updateMoonAndSun(){
   const now=new Date();
   navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=pos.coords.latitude, lon=pos.coords.longitude;
+    const lat=pos.coords.latitude;
+    const lon=pos.coords.longitude;
+
+    // Moon
     const moonPos=SunCalc.getMoonPosition(now,lat,lon);
     const moonIll=SunCalc.getMoonIllumination(now);
     const moonTimes=SunCalc.getMoonTimes(now,lat,lon);
@@ -345,6 +357,7 @@ function updateMoonAndSun(){
     const arrow=document.getElementById("compassArrow");
     if(arrow){arrow.style.transform=`rotate(${moonAz}deg)`;}
 
+    // Sun
     const sunPos=SunCalc.getPosition(now,lat,lon);
     const sunAlt=(sunPos.altitude*180/Math.PI).toFixed(2);
     const sunAz=((sunPos.azimuth*180/Math.PI)+180).toFixed(2);
@@ -356,7 +369,6 @@ function updateMoonAndSun(){
 }
 updateMoonAndSun();
 setInterval(updateMoonAndSun,60000);
-
 /* ---------- Google Login ---------- */
 document.getElementById('googleLoginBtn').onclick = async ()=>{
   const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
